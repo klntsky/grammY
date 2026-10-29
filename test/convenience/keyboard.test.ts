@@ -77,8 +77,8 @@ describe("Keyboard", () => {
     it("can be transposed", () => {
         function t(btns: string[][], expected: string[][]) {
             assertEquals(
-                Keyboard.from(btns).toTransposed(),
-                Keyboard.from(expected),
+                Keyboard.from(btns).toTransposed().keyboard,
+                Keyboard.from(expected).keyboard,
             );
         }
         t([["a"]], [["a"]]);
@@ -88,7 +88,9 @@ describe("Keyboard", () => {
             [["a", "b"], ["c"], ["d", "e", "f"]],
             [["a", "c", "d"], ["b", "e"], ["f"]],
         );
-        const keyboard = Keyboard.from([["a", "b", "c"], ["d", "e"], ["f"]]);
+        const keyboard = Keyboard.from([["a", "b", "c"], ["d", "e"], ["f"]])
+            .persistent().selected(false).oneTime().resized(false)
+            .placeholder("Choose").forceReply();
         assertEquals(keyboard.toTransposed().toTransposed(), keyboard);
     });
 
@@ -102,8 +104,8 @@ describe("Keyboard", () => {
             assertEquals(
                 Keyboard.from(btns).toFlowed(cols, {
                     fillLastRow: flow === "bottom",
-                }),
-                Keyboard.from(expected),
+                }).keyboard,
+                Keyboard.from(expected).keyboard,
             );
         }
         r(4, "top", [["a"]], [["a"]]);
@@ -124,7 +126,9 @@ describe("Keyboard", () => {
             [[..."abcdefghij"]],
             [["a"], ["b", "c", "d"], ["e", "f", "g"], ["h", "i", "j"]],
         );
-        const keyboard = Keyboard.from([["a", "b", "c"], ["d", "e"], ["f"]]);
+        const keyboard = Keyboard.from([["a", "b", "c"], ["d", "e"], ["f"]])
+            .persistent().selected(false).oneTime().resized(false)
+            .placeholder("Choose").forceReply();
         assertEquals(
             keyboard.toFlowed(3).toFlowed(3),
             keyboard.toFlowed(3),
@@ -232,8 +236,8 @@ describe("InlineKeyboard", () => {
                 ),
             );
             assertEquals(
-                InlineKeyboard.from(actual).toTransposed(),
-                InlineKeyboard.from(expected),
+                InlineKeyboard.from(actual).toTransposed().inline_keyboard,
+                InlineKeyboard.from(expected).inline_keyboard,
             );
         }
         t([["a"]], [["a"]]);
@@ -246,7 +250,7 @@ describe("InlineKeyboard", () => {
         const keyboard = new InlineKeyboard().text("a").text("b").text("c")
             .row()
             .text("d").text("e").row()
-            .text("f");
+            .text("f").forceReply();
         assertEquals(keyboard.toTransposed().toTransposed(), keyboard);
     });
 
@@ -266,8 +270,9 @@ describe("InlineKeyboard", () => {
                 ),
             );
             assertEquals(
-                actual.toFlowed(cols, { fillLastRow: flow === "bottom" }),
-                expected,
+                actual.toFlowed(cols, { fillLastRow: flow === "bottom" })
+                    .inline_keyboard,
+                expected.inline_keyboard,
             );
         }
         r(4, "top", [["a"]], [["a"]]);
@@ -293,7 +298,7 @@ describe("InlineKeyboard", () => {
         const keyboard = new InlineKeyboard()
             .text("a").text("b").text("c").row()
             .text("d").text("e").row()
-            .text("f");
+            .text("f").forceReply();
         assertEquals(
             keyboard.toFlowed(3).toFlowed(3),
             keyboard.toFlowed(3),
@@ -307,7 +312,7 @@ describe("InlineKeyboard", () => {
         );
         assertEquals(InlineKeyboard.from(raw).inline_keyboard, raw);
 
-        const keyboard = new InlineKeyboard().text("button");
+        const keyboard = new InlineKeyboard().text("button").forceReply();
         assertNotStrictEquals(InlineKeyboard.from(keyboard), keyboard);
         assertEquals(InlineKeyboard.from(keyboard), keyboard);
     });

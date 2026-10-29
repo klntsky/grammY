@@ -29,6 +29,7 @@ describe("API client", () => {
         );
         canUseWebhookReply = false;
         api = createRawApi(token, {
+            fetch: (...args) => globalThis.fetch(...args),
             apiRoot: "my-api-root",
             buildUrl: spy((root, token, method) => `${root}${token}${method}`),
             canUseWebhookReply: () => canUseWebhookReply,
