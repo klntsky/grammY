@@ -25,6 +25,7 @@ import {
     type PassportElementError,
     type ReactionType,
 } from "../types.ts";
+import { type AbortSignal } from "./abort.ts";
 import {
     type ApiClientOptions,
     createRawApi,

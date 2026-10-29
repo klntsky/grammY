@@ -8,6 +8,7 @@ export {
 } from "./bot.ts";
 
 export { InputFile } from "./types.ts";
+export { type AbortSignal } from "./core/abort.ts";
 
 export {
     type CallbackQueryContext,

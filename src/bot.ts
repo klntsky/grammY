@@ -7,6 +7,7 @@ import {
     run,
 } from "./composer.ts";
 import { Context, type MaybeArray, type ReactionContext } from "./context.ts";
+import { type AbortSignal } from "./core/abort.ts";
 import { Api } from "./core/api.ts";
 import {
     type ApiClientOptions,

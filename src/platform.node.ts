@@ -2,6 +2,10 @@
 import { Agent as HttpAgent } from "http";
 import { Agent as HttpsAgent } from "https";
 import { Readable } from "stream";
+import { type RequestInit } from "node-fetch";
+
+export type FetchOptions = Omit<RequestInit, "signal">;
+export { type Response as FetchResponse } from "node-fetch";
 
 // === Export debug
 export { debug } from "debug";

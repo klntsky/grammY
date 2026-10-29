@@ -1,9 +1,15 @@
-import { baseFetchConfig, debug as d } from "../platform.deno.ts";
+import {
+    baseFetchConfig,
+    debug as d,
+    type FetchOptions,
+    type FetchResponse,
+} from "../platform.deno.ts";
 import {
     type ApiMethods as Telegram,
     type ApiResponse,
     type Opts,
 } from "../types.ts";
+import { type AbortSignal } from "./abort.ts";
 import { toGrammyError, toHttpError } from "./error.ts";
 import {
     createFormDataPayload,
@@ -105,6 +111,15 @@ function concatTransformer<R extends RawApi>(
     return (method, payload, signal) => trans(prev, method, payload, signal);
 }
 
+type FetchConfig = NonNullable<Parameters<typeof fetch>[1]>;
+
+type ApiFetch = (
+    url: string | URL,
+    init?: FetchOptions & {
+        signal?: AbortSignal | null;
+    },
+) => Promise<FetchResponse>;
+
 /**
  * Options to pass to the API client that eventually connects to the Telegram
  * Bot API server and makes the HTTP requests.
@@ -200,16 +215,16 @@ export interface ApiClientOptions {
      * Base configuration for `fetch` calls. Specify any additional parameters
      * to use when fetching a method of the Telegram Bot API. Default: `{
      * compress: true, duplex: "half" }` (Node), `{ duplex: "half" }` (Deno, Web)
+     *
+     * The method, headers, body, and cancellation signal are managed by grammY.
+     * To cancel a request, pass a signal to the API call instead.
      */
-    baseFetchConfig?: Omit<
-        NonNullable<Parameters<typeof fetch>[1]>,
-        "method" | "headers" | "body"
-    >;
+    baseFetchConfig?: Omit<FetchOptions, "method" | "headers" | "body">;
 
     /**
      * `fetch` function to use for making HTTP requests. Default: `node-fetch` in Node.js, `fetch` in Deno.
      */
-    fetch?: typeof fetch;
+    fetch?: ApiFetch;
 
     /**
      * When the network connection is unreliable and some API requests fail
@@ -226,9 +241,12 @@ export interface ApiClientOptions {
 }
 
 class ApiClient<R extends RawApi> {
-    private readonly options: Required<ApiClientOptions>;
+    private readonly options: Required<Omit<ApiClientOptions, "fetch">>;
 
-    private readonly fetch: typeof fetch;
+    private readonly fetch: (
+        url: string | URL,
+        init: FetchConfig,
+    ) => Promise<FetchResponse>;
 
     private hasUsedWebhookReply = false;
 
@@ -259,11 +277,8 @@ class ApiClient<R extends RawApi> {
             },
             canUseWebhookReply: options.canUseWebhookReply ?? (() => false),
             sensitiveLogs: options.sensitiveLogs ?? false,
-            fetch:
-                ((...args: Parameters<typeof fetch>) =>
-                    fetchFn(...args)) as typeof fetch,
         };
-        this.fetch = this.options.fetch;
+        this.fetch = (url, init) => fetchFn(url, init);
         if (this.options.apiRoot.endsWith("/")) {
             throw new Error(
                 `Remove the trailing '/' from the 'apiRoot' option (use '${

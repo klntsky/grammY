@@ -1,5 +1,8 @@
 // deno-lint-ignore-file no-import-prefix
 
+export type FetchOptions = Omit<RequestInit, "signal">;
+export type FetchResponse = Response;
+
 /** Are we running on Deno or in a web browser? */
 export const isDeno = typeof Deno !== "undefined";
 

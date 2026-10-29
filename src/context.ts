@@ -1,4 +1,5 @@
 // deno-lint-ignore-file camelcase
+import { type AbortSignal } from "./core/abort.ts";
 import { type Api, type Other as OtherApi } from "./core/api.ts";
 import { type Methods, type RawApi } from "./core/client.ts";
 import {

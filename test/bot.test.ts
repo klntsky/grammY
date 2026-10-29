@@ -1,6 +1,7 @@
 import { Bot } from "../src/bot.ts";
 import { BotError } from "../src/composer.ts";
 import { Context } from "../src/context.ts";
+import { type AbortSignal } from "../src/core/abort.ts";
 import { GrammyError, HttpError } from "../src/core/error.ts";
 import type { Message, Update, UserFromGetMe } from "../src/types.ts";
 import {
